@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecuaciones No Lineales - Análisis Numérico</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-calculator"></i> Análisis Numérico
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('index') }}">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h1 class="text-center mb-5">
+            <i class="fas fa-square-root-alt"></i> Ecuaciones No Lineales
+        </h1>
+
+        <!-- Tabs para diferentes métodos -->
+        <ul class="nav nav-tabs" id="metodosTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="biseccion-tab" data-bs-toggle="tab" data-bs-target="#biseccion" type="button">
+                    <i class="fas fa-cut"></i> Bisección
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="punto-fijo-tab" data-bs-toggle="tab" data-bs-target="#punto-fijo" type="button">
+                    <i class="fas fa-crosshairs"></i> Punto Fijo
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="regla-falsa-tab" data-bs-toggle="tab" data-bs-target="#regla-falsa" type="button">
+                    <i class="fas fa-balance-scale"></i> Regla Falsa
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="busqueda-tab" data-bs-toggle="tab" data-bs-target="#busqueda" type="button">
+                    <i class="fas fa-search"></i> Búsqueda Incremental
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="metodosTabContent">
+            <!-- Método de Bisección -->
+            <div class="tab-pane fade show active" id="biseccion" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-cut"></i> Método de Bisección</h5>
+                        <small class="text-muted">Encuentra raíces en un intervalo con cambio de signo</small>
+                    </div>
+                    <div class="card-body">
+                        <form id="biseccionForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="biseccion_xi" class="form-label">Xi (extremo izquierdo):</label>
+                                        <input type="number" step="any" class="form-control" id="biseccion_xi" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="biseccion_xs" class="form-label">Xs (extremo derecho):</label>
+                                        <input type="number" step="any" class="form-control" id="biseccion_xs" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="biseccion_tol" class="form-label">Tolerancia:</label>
+                                        <input type="number" step="any" class="form-control" id="biseccion_tol" value="0.001" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="biseccion_niter" class="form-label">Número de iteraciones:</label>
+                                        <input type="number" class="form-control" id="biseccion_niter" value="100" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="biseccion_funcion" class="form-label">Función f(x):</label>
+                                <input type="text" class="form-control" id="biseccion_funcion" placeholder="Ej: x**2 - 4" required>
+                                <div class="form-text">Use 'x' como variable. Funciones disponibles: sin, cos, tan, exp, log, sqrt</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Calcular
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Resultados -->
+                <div id="biseccionResultados" class="mt-4" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Resultados - Método de Bisección</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="biseccionOutput"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Método de Punto Fijo -->
+            <div class="tab-pane fade" id="punto-fijo" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-crosshairs"></i> Método de Punto Fijo</h5>
+                        <small class="text-muted">Encuentra puntos fijos de una función de iteración</small>
+                    </div>
+                    <div class="card-body">
+                        <form id="puntoFijoForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="pf_x0" class="form-label">X0 (valor inicial):</label>
+                                        <input type="number" step="any" class="form-control" id="pf_x0" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="pf_tol" class="form-label">Tolerancia:</label>
+                                        <input type="number" step="any" class="form-control" id="pf_tol" value="0.001" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="pf_niter" class="form-label">Número de iteraciones:</label>
+                                        <input type="number" class="form-control" id="pf_niter" value="100" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="pf_funcion_f" class="form-label">Función f(x) original:</label>
+                                <input type="text" class="form-control" id="pf_funcion_f" placeholder="Ej: x**2 - 4" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="pf_funcion_g" class="form-label">Función de iteración g(x):</label>
+                                <input type="text" class="form-control" id="pf_funcion_g" placeholder="Ej: sqrt(4)" required>
+                                <div class="form-text">g(x) debe cumplir que la raíz de f(x) sea un punto fijo de g(x)</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Calcular
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="puntoFijoResultados" class="mt-4" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Resultados - Método de Punto Fijo</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="puntoFijoOutput"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Método de Regla Falsa -->
+            <div class="tab-pane fade" id="regla-falsa" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-balance-scale"></i> Método de Regla Falsa</h5>
+                        <small class="text-muted">Interpolación lineal para encontrar raíces</small>
+                    </div>
+                    <div class="card-body">
+                        <form id="reglaFalsaForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="rf_x0" class="form-label">X0 (extremo izquierdo):</label>
+                                        <input type="number" step="any" class="form-control" id="rf_x0" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="rf_x1" class="form-label">X1 (extremo derecho):</label>
+                                        <input type="number" step="any" class="form-control" id="rf_x1" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="rf_tol" class="form-label">Tolerancia:</label>
+                                        <input type="number" step="any" class="form-control" id="rf_tol" value="0.001" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="rf_niter" class="form-label">Número de iteraciones:</label>
+                                        <input type="number" class="form-control" id="rf_niter" value="100" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rf_funcion" class="form-label">Función f(x):</label>
+                                <input type="text" class="form-control" id="rf_funcion" placeholder="Ej: x**2 - 4" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Calcular
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="reglaFalsaResultados" class="mt-4" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Resultados - Método de Regla Falsa</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="reglaFalsaOutput"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Búsqueda Incremental -->
+            <div class="tab-pane fade" id="busqueda" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-search"></i> Búsqueda Incremental</h5>
+                        <small class="text-muted">Encuentra intervalos con cambio de signo</small>
+                    </div>
+                    <div class="card-body">
+                        <form id="busquedaForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="bi_x0" class="form-label">X0 (valor inicial):</label>
+                                        <input type="number" step="any" class="form-control" id="bi_x0" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="bi_delta" class="form-label">Delta (incremento):</label>
+                                        <input type="number" step="any" class="form-control" id="bi_delta" value="0.5" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="bi_niter" class="form-label">Número de iteraciones:</label>
+                                        <input type="number" class="form-control" id="bi_niter" value="100" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="bi_funcion" class="form-label">Función f(x):</label>
+                                <input type="text" class="form-control" id="bi_funcion" placeholder="Ej: x**2 - 4" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Calcular
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="busquedaResultados" class="mt-4" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Resultados - Búsqueda Incremental</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="busquedaOutput"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/ecuaciones.js') }}"></script>
+</body>
+</html>

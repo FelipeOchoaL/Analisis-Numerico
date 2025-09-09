@@ -1,0 +1,120 @@
+from fastapi import APIRouter, HTTPException
+from models.schemas import (
+    BiseccionRequest, PuntoFijoRequest, ReglaFalsaRequest, 
+    BusquedaIncrementalRequest, MetodoResponse
+)
+from services.ecuaciones_service import EcuacionesService
+import time
+
+router = APIRouter()
+service = EcuacionesService()
+
+@router.post("/biseccion", response_model=MetodoResponse)
+async def metodo_biseccion(request: BiseccionRequest):
+    """
+    Implementa el método de bisección para encontrar raíces de ecuaciones no lineales.
+    
+    - **xi**: Extremo izquierdo del intervalo
+    - **xs**: Extremo derecho del intervalo  
+    - **tolerancia**: Tolerancia del método
+    - **niter**: Número máximo de iteraciones
+    - **funcion**: Función f(x) como string (usar 'x' como variable)
+    """
+    try:
+        start_time = time.time()
+        resultado = service.biseccion(
+            xi=request.xi,
+            xs=request.xs,
+            tolerancia=request.tolerancia,
+            niter=request.niter,
+            funcion=request.funcion
+        )
+        end_time = time.time()
+        
+        resultado["tiempo_ejecucion"] = end_time - start_time
+        return resultado
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/punto-fijo", response_model=MetodoResponse)
+async def metodo_punto_fijo(request: PuntoFijoRequest):
+    """
+    Implementa el método de punto fijo para encontrar raíces de ecuaciones no lineales.
+    
+    - **x0**: Valor inicial
+    - **tolerancia**: Tolerancia del método
+    - **niter**: Número máximo de iteraciones
+    - **funcion_f**: Función f(x) original
+    - **funcion_g**: Función de iteración g(x)
+    """
+    try:
+        start_time = time.time()
+        resultado = service.punto_fijo(
+            x0=request.x0,
+            tolerancia=request.tolerancia,
+            niter=request.niter,
+            funcion_f=request.funcion_f,
+            funcion_g=request.funcion_g
+        )
+        end_time = time.time()
+        
+        resultado["tiempo_ejecucion"] = end_time - start_time
+        return resultado
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/regla-falsa", response_model=MetodoResponse)
+async def metodo_regla_falsa(request: ReglaFalsaRequest):
+    """
+    Implementa el método de regla falsa para encontrar raíces de ecuaciones no lineales.
+    
+    - **x0**: Extremo izquierdo del intervalo
+    - **x1**: Extremo derecho del intervalo
+    - **tolerancia**: Tolerancia del método
+    - **niter**: Número máximo de iteraciones
+    - **funcion**: Función f(x) como string
+    """
+    try:
+        start_time = time.time()
+        resultado = service.regla_falsa(
+            x0=request.x0,
+            x1=request.x1,
+            tolerancia=request.tolerancia,
+            niter=request.niter,
+            funcion=request.funcion
+        )
+        end_time = time.time()
+        
+        resultado["tiempo_ejecucion"] = end_time - start_time
+        return resultado
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/busqueda-incremental", response_model=MetodoResponse)
+async def busqueda_incremental(request: BusquedaIncrementalRequest):
+    """
+    Implementa la búsqueda incremental para encontrar intervalos con cambio de signo.
+    
+    - **x0**: Valor inicial
+    - **delta**: Incremento
+    - **niter**: Número máximo de iteraciones
+    - **funcion**: Función f(x) como string
+    """
+    try:
+        start_time = time.time()
+        resultado = service.busqueda_incremental(
+            x0=request.x0,
+            delta=request.delta,
+            niter=request.niter,
+            funcion=request.funcion
+        )
+        end_time = time.time()
+        
+        resultado["tiempo_ejecucion"] = end_time - start_time
+        return resultado
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
