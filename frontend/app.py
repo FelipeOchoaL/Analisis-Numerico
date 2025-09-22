@@ -23,6 +23,10 @@ def errores():
 def series_taylor():
     return render_template('series_taylor.html')
 
+@app.route('/sistemas-ecuaciones')
+def sistemas_ecuaciones():
+    return render_template('sistemas_ecuaciones.html')
+
 # Rutas proxy para comunicarse con la API
 @app.route('/api/biseccion', methods=['POST'])
 def proxy_biseccion():
@@ -65,6 +69,18 @@ def proxy_busqueda_incremental():
     try:
         response = requests.post(
             f"{API_BASE_URL}/ecuaciones-no-lineales/busqueda-incremental",
+            json=request.json,
+            timeout=30
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/newton-raphson', methods=['POST'])
+def proxy_newton_raphson():
+    try:
+        response = requests.post(
+            f"{API_BASE_URL}/ecuaciones-no-lineales/newton-raphson",
             json=request.json,
             timeout=30
         )
@@ -125,6 +141,30 @@ def proxy_taylor_seno():
     try:
         response = requests.post(
             f"{API_BASE_URL}/series-taylor/seno",
+            json=request.json,
+            timeout=30
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/gauss-pivoteo', methods=['POST'])
+def proxy_gauss_pivoteo():
+    try:
+        response = requests.post(
+            f"{API_BASE_URL}/sistemas-ecuaciones/gauss-pivoteo",
+            json=request.json,
+            timeout=30
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/validar-sistema', methods=['POST'])
+def proxy_validar_sistema():
+    try:
+        response = requests.post(
+            f"{API_BASE_URL}/sistemas-ecuaciones/validar-sistema",
             json=request.json,
             timeout=30
         )

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from models.schemas import (
     BiseccionRequest, PuntoFijoRequest, ReglaFalsaRequest, 
-    BusquedaIncrementalRequest, MetodoResponse
+    BusquedaIncrementalRequest, NewtonRaphsonRequest, SecanteRequest, MetodoResponse
 )
 from services.ecuaciones_service import EcuacionesService
 import time
@@ -110,6 +110,80 @@ async def busqueda_incremental(request: BusquedaIncrementalRequest):
             delta=request.delta,
             niter=request.niter,
             funcion=request.funcion
+        )
+        end_time = time.time()
+        
+        resultado["tiempo_ejecucion"] = end_time - start_time
+        return resultado
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/newton-raphson", response_model=MetodoResponse)
+async def metodo_newton_raphson(request: NewtonRaphsonRequest):
+    """
+    Implementa el método de Newton-Raphson para encontrar raíces de ecuaciones no lineales.
+    
+    El método utiliza la fórmula: x_{i+1} = x_i - f(x_i)/f'(x_i)
+    
+    - **x0**: Valor inicial
+    - **tolerancia**: Tolerancia del método
+    - **niter**: Número máximo de iteraciones
+    - **funcion_f**: Función f(x) como string (usar 'x' como variable)
+    - **funcion_df**: Derivada f'(x) como string (usar 'x' como variable)
+    - **incluir_error**: Si incluir columna de error en la tabla (opcional, por defecto True)
+    
+    La tabla de salida incluye: i, xi, f(xi), f'(xi) y opcionalmente E (error)
+    """
+    try:
+        start_time = time.time()
+        resultado = service.newton_raphson(
+            x0=request.x0,
+            tolerancia=request.tolerancia,
+            niter=request.niter,
+            funcion_f=request.funcion_f,
+            funcion_df=request.funcion_df,
+            incluir_error=request.incluir_error,
+            tipo_precision=request.tipo_precision,
+            precision=request.precision
+        )
+        end_time = time.time()
+        
+        resultado["tiempo_ejecucion"] = end_time - start_time
+        return resultado
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/secante", response_model=MetodoResponse)
+async def metodo_secante(request: SecanteRequest):
+    """
+    Implementa el método de la secante para encontrar raíces de ecuaciones no lineales.
+    
+    El método utiliza la fórmula: x_{i+1} = x_i - f(x_i) * (x_i - x_{i-1}) / (f(x_i) - f(x_{i-1}))
+    
+    - **x0**: Primer valor inicial
+    - **x1**: Segundo valor inicial
+    - **tolerancia**: Tolerancia del método
+    - **niter**: Número máximo de iteraciones
+    - **funcion**: Función f(x) como string (usar 'x' como variable)
+    - **incluir_error**: Si incluir columna de error en la tabla (opcional, por defecto True)
+    - **tipo_precision**: Tipo de precisión: "decimales" o "significativas" (opcional, por defecto "decimales")
+    - **precision**: Número de decimales o cifras significativas (opcional, por defecto 6)
+    
+    La tabla de salida incluye: i, xi-1, xi, f(xi-1), f(xi) y opcionalmente E (error)
+    """
+    try:
+        start_time = time.time()
+        resultado = service.secante(
+            x0=request.x0,
+            x1=request.x1,
+            tolerancia=request.tolerancia,
+            niter=request.niter,
+            funcion=request.funcion,
+            incluir_error=request.incluir_error,
+            tipo_precision=request.tipo_precision,
+            precision=request.precision
         )
         end_time = time.time()
         

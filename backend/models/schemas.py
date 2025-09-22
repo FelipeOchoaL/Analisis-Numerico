@@ -29,6 +29,26 @@ class BusquedaIncrementalRequest(BaseModel):
     niter: int = Field(..., gt=0, description="Número máximo de iteraciones")
     funcion: str = Field(..., description="Función f(x) como string")
 
+class NewtonRaphsonRequest(BaseModel):
+    x0: float = Field(..., description="Valor inicial")
+    tolerancia: float = Field(..., gt=0, description="Tolerancia del método")
+    niter: int = Field(..., gt=0, description="Número máximo de iteraciones")
+    funcion_f: str = Field(..., description="Función f(x) como string")
+    funcion_df: str = Field(..., description="Derivada f'(x) como string")
+    incluir_error: bool = Field(default=True, description="Incluir columna de error en la tabla")
+    tipo_precision: str = Field(default="decimales", description="Tipo de precisión: 'decimales' o 'significativas'")
+    precision: int = Field(default=6, gt=0, description="Número de decimales o cifras significativas")
+
+class SecanteRequest(BaseModel):
+    x0: float = Field(..., description="Primer valor inicial")
+    x1: float = Field(..., description="Segundo valor inicial")
+    tolerancia: float = Field(..., gt=0, description="Tolerancia del método")
+    niter: int = Field(..., gt=0, description="Número máximo de iteraciones")
+    funcion: str = Field(..., description="Función f(x) como string")
+    incluir_error: bool = Field(default=True, description="Incluir columna de error en la tabla")
+    tipo_precision: str = Field(default="decimales", description="Tipo de precisión: 'decimales' o 'significativas'")
+    precision: int = Field(default=6, gt=0, description="Número de decimales o cifras significativas")
+
 # Modelos para Errores
 class ErrorAbsolutoRequest(BaseModel):
     x_aproximado: float = Field(..., description="Valor aproximado")
