@@ -6,7 +6,8 @@ import uvicorn
 from routers import (
     ecuaciones_no_lineales,
     errores,
-    series_taylor
+    series_taylor,
+    sistemas_ecuaciones
 )
 
 # Crear la aplicación FastAPI
@@ -44,6 +45,12 @@ app.include_router(
     series_taylor.router,
     prefix="/api/series-taylor",
     tags=["Series de Taylor"]
+)
+
+app.include_router(
+    sistemas_ecuaciones.router,
+    prefix="/api/sistemas-ecuaciones",
+    tags=["Sistemas de Ecuaciones"]
 )
 
 @app.get("/")
