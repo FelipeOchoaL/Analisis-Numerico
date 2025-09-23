@@ -58,26 +58,46 @@ try:
     if frontend_templates_path.exists():
         templates = Jinja2Templates(directory=str(frontend_templates_path))
         
-        # Rutas del frontend
+        # Rutas del frontend con manejo de errores
         @app.get("/frontend", response_class=HTMLResponse)
         async def serve_frontend(request: Request):
-            return templates.TemplateResponse("index.html", {"request": request})
+            try:
+                return templates.TemplateResponse("index.html", {"request": request})
+            except Exception as e:
+                print(f"❌ Error serving frontend index: {e}")
+                return HTMLResponse(f"<h1>Error cargando frontend</h1><p>Error: {str(e)}</p><p><a href='/docs'>Ir a documentación de la API</a></p>", status_code=500)
         
         @app.get("/frontend/ecuaciones-no-lineales", response_class=HTMLResponse)
         async def ecuaciones_page(request: Request):
-            return templates.TemplateResponse("ecuaciones_no_lineales.html", {"request": request})
+            try:
+                return templates.TemplateResponse("ecuaciones_no_lineales.html", {"request": request})
+            except Exception as e:
+                print(f"❌ Error serving ecuaciones page: {e}")
+                return HTMLResponse(f"<h1>Error cargando página</h1><p>Error: {str(e)}</p><p><a href='/docs'>Ir a documentación de la API</a></p>", status_code=500)
         
         @app.get("/frontend/errores", response_class=HTMLResponse)
         async def errores_page(request: Request):
-            return templates.TemplateResponse("errores.html", {"request": request})
+            try:
+                return templates.TemplateResponse("errores.html", {"request": request})
+            except Exception as e:
+                print(f"❌ Error serving errores page: {e}")
+                return HTMLResponse(f"<h1>Error cargando página</h1><p>Error: {str(e)}</p><p><a href='/docs'>Ir a documentación de la API</a></p>", status_code=500)
         
         @app.get("/frontend/series-taylor", response_class=HTMLResponse)
         async def taylor_page(request: Request):
-            return templates.TemplateResponse("series_taylor.html", {"request": request})
+            try:
+                return templates.TemplateResponse("series_taylor.html", {"request": request})
+            except Exception as e:
+                print(f"❌ Error serving taylor page: {e}")
+                return HTMLResponse(f"<h1>Error cargando página</h1><p>Error: {str(e)}</p><p><a href='/docs'>Ir a documentación de la API</a></p>", status_code=500)
         
         @app.get("/frontend/sistemas-ecuaciones", response_class=HTMLResponse)
         async def sistemas_page(request: Request):
-            return templates.TemplateResponse("sistemas_ecuaciones.html", {"request": request})
+            try:
+                return templates.TemplateResponse("sistemas_ecuaciones.html", {"request": request})
+            except Exception as e:
+                print(f"❌ Error serving sistemas page: {e}")
+                return HTMLResponse(f"<h1>Error cargando página</h1><p>Error: {str(e)}</p><p><a href='/docs'>Ir a documentación de la API</a></p>", status_code=500)
 
 except ImportError:
     # Si no están disponibles las dependencias del frontend, solo usar API
@@ -120,6 +140,50 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+# Ruta de debug para diagnosticar el problema
+@app.get("/debug/structure")
+async def debug_structure():
+    """Ruta para debug - ver la estructura de archivos del proyecto"""
+    try:
+        from pathlib import Path
+        import traceback
+        
+        current_file = Path(__file__).resolve()
+        project_root = current_file.parent.parent
+        
+        # Verificar qué archivos existen
+        structure_info = {
+            "current_file": str(current_file),
+            "project_root": str(project_root),
+            "project_root_exists": project_root.exists(),
+            "frontend_dir_exists": (project_root / "frontend").exists(),
+            "static_dir_exists": (project_root / "frontend" / "static").exists(),
+            "templates_dir_exists": (project_root / "frontend" / "templates").exists(),
+        }
+        
+        # Listar archivos en project_root
+        if project_root.exists():
+            try:
+                structure_info["project_files"] = [item.name for item in project_root.iterdir() if item.is_dir() or item.suffix in ['.py', '.txt', '.md', '.yaml']]
+                
+                frontend_dir = project_root / "frontend"
+                if frontend_dir.exists():
+                    structure_info["frontend_files"] = [item.name for item in frontend_dir.iterdir()]
+                    
+                    templates_dir = frontend_dir / "templates"
+                    if templates_dir.exists():
+                        structure_info["template_files"] = [item.name for item in templates_dir.iterdir() if item.suffix == '.html']
+            except Exception as e:
+                structure_info["listing_error"] = str(e)
+        
+        return structure_info
+        
+    except Exception as e:
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
 
 if __name__ == "__main__":
     # Configuración para desarrollo local y Render
