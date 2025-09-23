@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: analisis-numerico-api
+    runtime: python3
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python start_render.py
+    env: python
+    envVars:
+      - key: RENDER_ENV
+        value: production
+      - key: PORT
+        generateValue: true
