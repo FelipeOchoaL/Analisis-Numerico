@@ -6,12 +6,12 @@
     <title>Análisis Numérico - API</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="/frontend">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fas fa-calculator"></i> Análisis Numérico
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -20,16 +20,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/frontend/ecuaciones-no-lineales">Ecuaciones No Lineales</a>
+                        <a class="nav-link" href="{{ url_for('ecuaciones_no_lineales') }}">Ecuaciones No Lineales</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/frontend/errores">Cálculo de Errores</a>
+                        <a class="nav-link" href="{{ url_for('errores') }}">Cálculo de Errores</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/frontend/series-taylor">Series de Taylor</a>
+                        <a class="nav-link" href="{{ url_for('series_taylor') }}">Series de Taylor</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/frontend/sistemas-ecuaciones">Sistemas de Ecuaciones</a>
+                        <a class="nav-link" href="{{ url_for('sistemas_ecuaciones') }}">Sistemas de Ecuaciones</a>
                     </li>
                 </ul>
             </div>
@@ -57,7 +57,7 @@
                             <br>• Regla Falsa
                             <br>• Búsqueda Incremental
                         </p>
-                        <a href="/frontend/ecuaciones-no-lineales" class="btn btn-primary">Acceder</a>
+                        <a href="{{ url_for('ecuaciones_no_lineales') }}" class="btn btn-primary">Acceder</a>
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                             <br>• Error Relativo
                             <br>• Propagación de Errores
                         </p>
-                        <a href="/frontend/errores" class="btn btn-success">Acceder</a>
+                        <a href="{{ url_for('errores') }}" class="btn btn-success">Acceder</a>
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                             <br>• Función Seno
                             <br>• Análisis de convergencia
                         </p>
-                        <a href="/frontend/series-taylor" class="btn btn-info">Acceder</a>
+                        <a href="{{ url_for('series_taylor') }}" class="btn btn-info">Acceder</a>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                             <br>• Pivoteo parcial y total
                             <br>• Análisis de estabilidad
                         </p>
-                        <a href="/frontend/sistemas-ecuaciones" class="btn btn-warning">Acceder</a>
+                        <a href="{{ url_for('sistemas_ecuaciones') }}" class="btn btn-warning">Acceder</a>
                     </div>
                 </div>
             </div>
