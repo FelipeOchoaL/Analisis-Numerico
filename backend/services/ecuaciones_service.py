@@ -175,7 +175,7 @@ class EcuacionesService:
             f_actual = self._evaluar_funcion(funcion_f, x_actual)
             i += 1
             
-            error = abs(x_actual - x_anterior)
+            error = abs((x_actual - x_anterior)/x_actual)
             
             iteraciones.append(IteracionData(
                 iteracion=i,
@@ -416,3 +416,292 @@ class EcuacionesService:
             iteraciones=iteraciones,
             mensaje=mensaje
         ).dict()
+    
+    def newton_raphson(self, x0: float, tolerancia: float, niter: int, 
+                      funcion_f: str, funcion_df: str, incluir_error: bool = True,
+                      tipo_precision: str = "decimales", precision: int = 6) -> Dict[str, Any]:
+        """Implementa el método de Newton-Raphson según el procedimiento de las imágenes"""
+        iteraciones = []
+        
+        xi = x0
+        
+        # Verificar que la derivada no sea cero en x0
+        try:
+            dfx0 = self._evaluar_funcion(funcion_df, x0)
+            if abs(dfx0) < 1e-12:
+                return MetodoResponse(
+                    exito=False,
+                    resultado=None,
+                    iteraciones=[],
+                    mensaje=f"Error: f'({x0}) ≈ 0. El método no converge con este valor inicial."
+                ).dict()
+        except Exception as e:
+            return MetodoResponse(
+                exito=False,
+                resultado=None,
+                iteraciones=[],
+                mensaje=f"Error evaluando la derivada en x0: {str(e)}"
+            ).dict()
+        
+        # Variables para el algoritmo
+        xi_anterior = None
+        
+        for i in range(niter + 1):
+            try:
+                # PASO 1: Evaluar f(xi) y f'(xi)
+                fxi = self._evaluar_funcion(funcion_f, xi)
+                dfxi = self._evaluar_funcion(funcion_df, xi)
+                
+                # Verificar si f'(xi) es muy pequeño
+                if abs(dfxi) < 1e-12:
+                    return MetodoResponse(
+                        exito=False,
+                        resultado=xi,
+                        iteraciones=iteraciones,
+                        mensaje=f"Error: f'({xi}) ≈ 0 en la iteración {i}. El método no puede continuar."
+                    ).dict()
+                
+                # Preparar valores para la iteración
+                valores = {
+                    "i": i,
+                    "xi": xi,
+                    "fxi": fxi,
+                    "dfxi": dfxi
+                }
+                
+                # PASO 3: Calcular error si no es la primera iteración
+                error = None
+                if i > 0 and incluir_error and xi_anterior is not None:
+                    if abs(xi) > 1e-12:
+                        error = abs(xi - xi_anterior) / abs(xi)
+                    else:
+                        error = abs(xi - xi_anterior)
+                    valores["error"] = error
+                elif incluir_error:
+                    valores["error"] = None  # No hay error en la primera iteración
+                
+                # Verificar convergencia por función
+                if abs(fxi) <= tolerancia:
+                    iteraciones.append(IteracionData(
+                        iteracion=i,
+                        valores=valores,
+                        error=error,
+                        observacion="Convergencia por función"
+                    ))
+                    return MetodoResponse(
+                        exito=True,
+                        resultado=xi,
+                        iteraciones=iteraciones,
+                        mensaje=f"Convergencia alcanzada en iteración {i}. Raíz: x = {self._formatear_numero(xi, tipo_precision, precision)}"
+                    ).dict()
+                
+                # Verificar convergencia por error
+                if i > 0 and incluir_error and error is not None and error <= tolerancia:
+                    iteraciones.append(IteracionData(
+                        iteracion=i,
+                        valores=valores,
+                        error=error,
+                        observacion="Convergencia por error"
+                    ))
+                    return MetodoResponse(
+                        exito=True,
+                        resultado=xi,
+                        iteraciones=iteraciones,
+                        mensaje=f"Convergencia por error alcanzada en iteración {i}. Raíz: x = {self._formatear_numero(xi, tipo_precision, precision)}"
+                    ).dict()
+                
+                # Agregar iteración actual
+                iteraciones.append(IteracionData(
+                    iteracion=i,
+                    valores=valores,
+                    error=error,
+                    observacion="Newton-Raphson"
+                ))
+                
+                # PASO 2: Calcular la siguiente aproximación (si no es la última iteración)
+                if i < niter:
+                    xi_anterior = xi
+                    xi = xi - fxi / dfxi
+                
+            except Exception as e:
+                return MetodoResponse(
+                    exito=False,
+                    resultado=xi if 'xi' in locals() else None,
+                    iteraciones=iteraciones,
+                    mensaje=f"Error en iteración {i}: {str(e)}"
+                ).dict()
+        
+        # Si llegamos aquí, se alcanzó el límite de iteraciones
+        return MetodoResponse(
+            exito=False,
+            resultado=xi,
+            iteraciones=iteraciones,
+            mensaje=f"Método alcanzó el límite de {niter} iteraciones sin convergencia. Última aproximación: x = {self._formatear_numero(xi, tipo_precision, precision)}"
+        ).dict()
+    
+    def secante(self, x0: float, x1: float, tolerancia: float, niter: int, 
+                funcion: str, incluir_error: bool = True, tipo_precision: str = "decimales", 
+                precision: int = 6) -> Dict[str, Any]:
+        """
+        Implementa el método de la secante según el procedimiento matemático estándar
+        
+        Args:
+            x0: Primer valor inicial
+            x1: Segundo valor inicial  
+            tolerancia: Tolerancia para convergencia
+            niter: Número máximo de iteraciones
+            funcion: Función f(x) como string
+            incluir_error: Si incluir columna de error
+            tipo_precision: "decimales" o "significativas"
+            precision: Número de decimales o cifras significativas
+        """
+        iteraciones = []
+        
+        # Verificar que los valores iniciales sean diferentes
+        if abs(x1 - x0) < 1e-12:
+            return MetodoResponse(
+                exito=False,
+                resultado=None,
+                iteraciones=[],
+                mensaje="Error: Los valores iniciales x0 y x1 deben ser diferentes."
+            ).dict()
+        
+        # Variables para el algoritmo
+        xi_anterior = x0  # x_{i-1}
+        xi = x1           # x_i
+        
+        # Evaluaciones iniciales
+        try:
+            fxi_anterior = self._evaluar_funcion(funcion, xi_anterior)
+            fxi = self._evaluar_funcion(funcion, xi)
+        except Exception as e:
+            return MetodoResponse(
+                exito=False,
+                resultado=None,
+                iteraciones=[],
+                mensaje=f"Error evaluando función en valores iniciales: {str(e)}"
+            ).dict()
+        
+        for i in range(niter + 1):
+            try:
+                # Preparar valores para la iteración
+                valores = {
+                    "i": i,
+                    "xi_anterior": xi_anterior,
+                    "xi": xi,
+                    "fxi_anterior": fxi_anterior,
+                    "fxi": fxi
+                }
+                
+                # Calcular error si no es la primera iteración
+                error = None
+                if i > 0 and incluir_error:
+                    if abs(xi) > 1e-12:
+                        error = abs(xi - xi_anterior) / abs(xi)
+                    else:
+                        error = abs(xi - xi_anterior)
+                    valores["error"] = error
+                elif incluir_error:
+                    valores["error"] = None  # No hay error en la primera iteración
+                
+                # Verificar convergencia por función
+                if abs(fxi) <= tolerancia:
+                    iteraciones.append(IteracionData(
+                        iteracion=i,
+                        valores=valores,
+                        error=error,
+                        observacion="Convergencia por función"
+                    ))
+                    return MetodoResponse(
+                        exito=True,
+                        resultado=xi,
+                        iteraciones=iteraciones,
+                        mensaje=f"Convergencia alcanzada en iteración {i}. Raíz: x = {self._formatear_numero(xi, tipo_precision, precision)}"
+                    ).dict()
+                
+                # Verificar convergencia por error
+                if i > 0 and incluir_error and error is not None and error <= tolerancia:
+                    iteraciones.append(IteracionData(
+                        iteracion=i,
+                        valores=valores,
+                        error=error,
+                        observacion="Convergencia por error"
+                    ))
+                    return MetodoResponse(
+                        exito=True,
+                        resultado=xi,
+                        iteraciones=iteraciones,
+                        mensaje=f"Convergencia por error alcanzada en iteración {i}. Raíz: x = {self._formatear_numero(xi, tipo_precision, precision)}"
+                    ).dict()
+                
+                # Verificar si f(xi) - f(xi-1) es muy pequeño (evitar división por cero)
+                denominador = fxi - fxi_anterior
+                if abs(denominador) < 1e-12:
+                    iteraciones.append(IteracionData(
+                        iteracion=i,
+                        valores=valores,
+                        error=error,
+                        observacion="Error: Denominador muy pequeño"
+                    ))
+                    return MetodoResponse(
+                        exito=False,
+                        resultado=xi,
+                        iteraciones=iteraciones,
+                        mensaje=f"Error: f(xi) - f(xi-1) ≈ 0 en la iteración {i}. El método no puede continuar."
+                    ).dict()
+                
+                # Agregar iteración actual
+                iteraciones.append(IteracionData(
+                    iteracion=i,
+                    valores=valores,
+                    error=error,
+                    observacion="Secante"
+                ))
+                
+                # Calcular la siguiente aproximación (si no es la última iteración)
+                if i < niter:
+                    xi_nuevo = xi - fxi * (xi - xi_anterior) / denominador
+                    
+                    # Preparar para siguiente iteración
+                    xi_anterior = xi
+                    xi = xi_nuevo
+                    fxi_anterior = fxi
+                    fxi = self._evaluar_funcion(funcion, xi)
+                
+            except Exception as e:
+                return MetodoResponse(
+                    exito=False,
+                    resultado=xi if 'xi' in locals() else None,
+                    iteraciones=iteraciones,
+                    mensaje=f"Error en iteración {i}: {str(e)}"
+                ).dict()
+        
+        # Si llegamos aquí, se alcanzó el límite de iteraciones
+        return MetodoResponse(
+            exito=False,
+            resultado=xi,
+            iteraciones=iteraciones,
+            mensaje=f"Método alcanzó el límite de {niter} iteraciones sin convergencia. Última aproximación: x = {self._formatear_numero(xi, tipo_precision, precision)}"
+        ).dict()
+    
+    def _formatear_numero(self, numero: float, tipo_precision: str, precision: int) -> str:
+        """Formatea un número según el tipo de precisión especificado"""
+        if tipo_precision == "significativas":
+            # Formatear con cifras significativas
+            if numero == 0:
+                return "0"
+            
+            # Calcular el exponente para normalizar el número
+            exponente = math.floor(math.log10(abs(numero)))
+            factor = 10 ** (precision - 1 - exponente)
+            numero_redondeado = round(numero * factor) / factor
+            
+            # Formatear según el exponente
+            if exponente >= precision - 1 or exponente < -4:
+                return f"{numero_redondeado:.{precision-1}e}"
+            else:
+                decimales_mostrar = max(0, precision - 1 - exponente)
+                return f"{numero_redondeado:.{decimales_mostrar}f}"
+        else:
+            # Formatear con decimales fijos
+            return f"{numero:.{precision}f}"

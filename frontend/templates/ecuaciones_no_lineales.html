@@ -49,6 +49,16 @@
                     <i class="fas fa-search"></i> Búsqueda Incremental
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="newton-raphson-tab" data-bs-toggle="tab" data-bs-target="#newton-raphson" type="button">
+                    <i class="fas fa-chart-line"></i> Newton-Raphson
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="secante-tab" data-bs-toggle="tab" data-bs-target="#secante" type="button">
+                    <i class="fas fa-trending-up"></i> Secante
+                </button>
+            </li>
         </ul>
 
         <div class="tab-content" id="metodosTabContent">
@@ -262,6 +272,184 @@
                         </div>
                         <div class="card-body">
                             <div id="busquedaOutput"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Método de Newton-Raphson -->
+            <div class="tab-pane fade" id="newton-raphson" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-line"></i> Método de Newton-Raphson</h5>
+                        <small class="text-muted">Método iterativo que usa la derivada: x_{i+1} = x_i - f(x_i)/f'(x_i)</small>
+                    </div>
+                    <div class="card-body">
+                        <form id="newtonRaphsonForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="nr_x0" class="form-label">X0 (valor inicial):</label>
+                                        <input type="number" step="any" class="form-control" id="nr_x0" required>
+                                        <div class="form-text">Valor inicial para comenzar las iteraciones</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="nr_tol" class="form-label">Tolerancia:</label>
+                                        <input type="number" step="any" class="form-control" id="nr_tol" value="0.000001" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="nr_niter" class="form-label">Número de iteraciones:</label>
+                                        <input type="number" class="form-control" id="nr_niter" value="50" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Incluir error en tabla:</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="nr_incluir_error" checked>
+                                            <label class="form-check-label" for="nr_incluir_error">
+                                                Mostrar columna E (error relativo)
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="nr_tipo_precision" class="form-label">Tipo de precisión:</label>
+                                        <select class="form-select" id="nr_tipo_precision">
+                                            <option value="decimales" selected>Decimales correctos</option>
+                                            <option value="significativas">Cifras significativas</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="nr_precision" class="form-label">Precisión:</label>
+                                        <input type="number" class="form-control" id="nr_precision" value="6" min="1" max="15" required>
+                                        <div class="form-text">Número de decimales o cifras significativas</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nr_funcion_f" class="form-label">Función f(x):</label>
+                                <input type="text" class="form-control" id="nr_funcion_f" placeholder="Ej: x**3 - 2*x - 5" required>
+                                <div class="form-text">Use 'x' como variable. Funciones disponibles: sin, cos, tan, exp, log, sqrt</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nr_funcion_df" class="form-label">Derivada f'(x):</label>
+                                <input type="text" class="form-control" id="nr_funcion_df" placeholder="Ej: 3*x**2 - 2" required>
+                                <div class="form-text">Derivada de la función f(x)</div>
+                            </div>
+                            
+                            <div class="alert alert-info" role="alert">
+                                <h6><i class="fas fa-info-circle"></i> Procedimiento del Método:</h6>
+                                <ol class="mb-0">
+                                    <li><strong>PASO 0:</strong> Calcular f'(x)</li>
+                                    <li><strong>PASO 1:</strong> Evaluar f(xi) y f'(xi)</li>
+                                    <li><strong>PASO 2:</strong> Calcular la raíz aproximada xi+1 = xi - f(xi)/f'(xi)</li>
+                                    <li><strong>PASO 3:</strong> Calcular el error E = |xi+1 - xi| / |xi+1|</li>
+                                </ol>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Calcular
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="newtonRaphsonResultados" class="mt-4" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Resultados - Método de Newton-Raphson</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="newtonRaphsonOutput"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Método de la Secante -->
+            <div class="tab-pane fade" id="secante" role="tabpanel">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-trending-up"></i> Método de la Secante</h5>
+                        <small class="text-muted">Método iterativo sin derivadas: x_{i+1} = x_i - f(x_i) * (x_i - x_{i-1}) / (f(x_i) - f(x_{i-1}))</small>
+                    </div>
+                    <div class="card-body">
+                        <form id="secanteForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="sec_x0" class="form-label">X0 (primer valor inicial):</label>
+                                        <input type="number" step="any" class="form-control" id="sec_x0" required>
+                                        <div class="form-text">Primer punto para iniciar las iteraciones</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="sec_x1" class="form-label">X1 (segundo valor inicial):</label>
+                                        <input type="number" step="any" class="form-control" id="sec_x1" required>
+                                        <div class="form-text">Segundo punto para iniciar las iteraciones</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="sec_tol" class="form-label">Tolerancia:</label>
+                                        <input type="number" step="any" class="form-control" id="sec_tol" value="0.000001" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="sec_niter" class="form-label">Número de iteraciones:</label>
+                                        <input type="number" class="form-control" id="sec_niter" value="50" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Incluir error en tabla:</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="sec_incluir_error" checked>
+                                            <label class="form-check-label" for="sec_incluir_error">
+                                                Mostrar columna E (error relativo)
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="sec_tipo_precision" class="form-label">Tipo de precisión:</label>
+                                        <select class="form-select" id="sec_tipo_precision">
+                                            <option value="decimales" selected>Decimales correctos</option>
+                                            <option value="significativas">Cifras significativas</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="sec_precision" class="form-label">Precisión:</label>
+                                        <input type="number" class="form-control" id="sec_precision" value="6" min="1" max="15" required>
+                                        <div class="form-text">Número de decimales o cifras significativas</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="sec_funcion" class="form-label">Función f(x):</label>
+                                <input type="text" class="form-control" id="sec_funcion" placeholder="Ej: x**3 - 2*x - 5" required>
+                                <div class="form-text">Use 'x' como variable. Funciones disponibles: sin, cos, tan, exp, log, sqrt</div>
+                            </div>
+                            
+                            <div class="alert alert-info" role="alert">
+                                <h6><i class="fas fa-info-circle"></i> Procedimiento del Método:</h6>
+                                <ol class="mb-0">
+                                    <li><strong>PASO 0:</strong> Establecer dos condiciones iniciales X0 y X1</li>
+                                    <li><strong>PASO 1:</strong> Evaluar f(x_{i-1}) y f(x_i)</li>
+                                    <li><strong>PASO 2:</strong> Calcular la raíz aproximada x_{i+1} = x_i - f(x_i) * (x_i - x_{i-1}) / (f(x_i) - f(x_{i-1}))</li>
+                                    <li><strong>PASO 3:</strong> Calcular el error E = |x_{i+1} - x_i| / |x_{i+1}|</li>
+                                </ol>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Calcular
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="secanteResultados" class="mt-4" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Resultados - Método de la Secante</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="secanteOutput"></div>
                         </div>
                     </div>
                 </div>
