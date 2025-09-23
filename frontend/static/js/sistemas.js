@@ -242,7 +242,7 @@ async function validarSistema() {
             tipo_pivoteo: parseInt(document.getElementById('tipoPivoteo').value)
         };
         
-        const response = await fetch('/api/validar-sistema', {
+        const response = await fetch(window.location.origin + '/api/validar-sistema', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -315,7 +315,7 @@ async function resolverSistema() {
             mostrar_proceso: mostrarProceso
         };
         
-        const response = await fetch('/api/gauss-pivoteo', {
+        const response = await fetch(window.location.origin + '/api/gauss-pivoteo', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

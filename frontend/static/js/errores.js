@@ -10,7 +10,7 @@ document.getElementById('errorAbsolutoForm').addEventListener('submit', async fu
     try {
         showLoading('errorAbsolutoResultados', 'errorAbsolutoOutput');
         
-        const response = await fetch('/api/error-absoluto', {
+        const response = await fetch(window.location.origin + '/api/error-absoluto', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ document.getElementById('errorRelativoForm').addEventListener('submit', async fu
     try {
         showLoading('errorRelativoResultados', 'errorRelativoOutput');
         
-        const response = await fetch('/api/error-relativo', {
+        const response = await fetch(window.location.origin + '/api/error-relativo', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ document.getElementById('propagacionForm').addEventListener('submit', async func
     try {
         showLoading('propagacionResultados', 'propagacionOutput');
         
-        const response = await fetch('/api/propagacion-error', {
+        const response = await fetch(window.location.origin + '/api/propagacion-error', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
