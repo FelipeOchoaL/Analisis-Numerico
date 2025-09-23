@@ -38,8 +38,19 @@ try:
     from pathlib import Path
     
     # Servir archivos estáticos del frontend (solo si existe)
-    frontend_static_path = Path("../frontend/static")
-    frontend_templates_path = Path("../frontend/templates")
+    # Obtener paths absolutos que funcionen en Render
+    current_file = Path(__file__).resolve()  # /opt/render/project/src/backend/main.py
+    project_root = current_file.parent.parent  # /opt/render/project/src/
+    frontend_static_path = project_root / "frontend" / "static"
+    frontend_templates_path = project_root / "frontend" / "templates"
+
+    # Debug logs para Render
+    print(f"🔍 Current file: {current_file}")
+    print(f"🔍 Project root: {project_root}")
+    print(f"🔍 Static path: {frontend_static_path}")
+    print(f"🔍 Templates path: {frontend_templates_path}")
+    print(f"🔍 Static exists: {frontend_static_path.exists()}")
+    print(f"🔍 Templates exists: {frontend_templates_path.exists()}")
     
     if frontend_static_path.exists():
         app.mount("/static", StaticFiles(directory=str(frontend_static_path)), name="static")
