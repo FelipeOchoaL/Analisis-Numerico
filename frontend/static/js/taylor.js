@@ -12,7 +12,7 @@ document.getElementById('cosenoForm').addEventListener('submit', async function(
     try {
         showLoading('cosenoResultados', 'cosenoOutput');
         
-        const response = await fetch(window.location.origin + '/api/taylor-coseno', {
+        const response = await fetch(window.location.origin + '/api/series-taylor/taylor-coseno', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ document.getElementById('senoForm').addEventListener('submit', async function(e)
     try {
         showLoading('senoResultados', 'senoOutput');
         
-        const response = await fetch(window.location.origin + '/api/taylor-seno', {
+        const response = await fetch(window.location.origin + '/api/series-taylor/taylor-seno', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

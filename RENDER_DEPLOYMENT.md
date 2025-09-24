@@ -50,3 +50,4 @@ git push origin main
 - El código funciona tanto localmente como en Render
 - Plan gratuito de Render: 750 horas/mes (suficiente para proyectos académicos)
 - **IMPORTANTE**: Los paths ahora están corregidos para funcionar desde dentro del repo
+

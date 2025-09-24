@@ -42,3 +42,4 @@ if __name__ == "__main__":
     print("🎨 Iniciando aplicación en Render...")
     setup_environment()
     start_application()
+

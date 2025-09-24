@@ -13,7 +13,7 @@ document.getElementById('biseccionForm').addEventListener('submit', async functi
     try {
         showLoading('biseccionResultados', 'biseccionOutput');
         
-        const response = await fetch(window.location.origin + '/api/biseccion', {
+        const response = await fetch(window.location.origin + '/api/ecuaciones-no-lineales/biseccion', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ document.getElementById('puntoFijoForm').addEventListener('submit', async functi
     try {
         showLoading('puntoFijoResultados', 'puntoFijoOutput');
         
-        const response = await fetch(window.location.origin + '/api/punto-fijo', {
+        const response = await fetch(window.location.origin + '/api/ecuaciones-no-lineales/punto-fijo', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ document.getElementById('reglaFalsaForm').addEventListener('submit', async funct
     try {
         showLoading('reglaFalsaResultados', 'reglaFalsaOutput');
         
-        const response = await fetch(window.location.origin + '/api/regla-falsa', {
+        const response = await fetch(window.location.origin + '/api/ecuaciones-no-lineales/regla-falsa', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ document.getElementById('busquedaForm').addEventListener('submit', async functio
     try {
         showLoading('busquedaResultados', 'busquedaOutput');
         
-        const response = await fetch(window.location.origin + '/api/busqueda-incremental', {
+        const response = await fetch(window.location.origin + '/api/ecuaciones-no-lineales/busqueda-incremental', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ document.getElementById('newtonRaphsonForm').addEventListener('submit', async fu
     try {
         showLoading('newtonRaphsonResultados', 'newtonRaphsonOutput');
         
-        const response = await fetch(window.location.origin + '/api/newton-raphson', {
+        const response = await fetch(window.location.origin + '/api/ecuaciones-no-lineales/newton-raphson', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ document.getElementById('secanteForm').addEventListener('submit', async function
     try {
         showLoading('secanteResultados', 'secanteOutput');
         
-        const response = await fetch(window.location.origin + '/api/secante', {
+        const response = await fetch(window.location.origin + '/api/ecuaciones-no-lineales/secante', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
